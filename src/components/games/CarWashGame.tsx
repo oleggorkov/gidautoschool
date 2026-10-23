@@ -64,11 +64,7 @@ export function CarWashGame({ onComplete }: { onComplete: (score: number) => voi
   }
 
   function scrub(e: React.PointerEvent<HTMLCanvasElement>) {
-    if (phase !== "play" || (e.pointerType === "mouse" && e.buttons === 0 && e.type !== "pointerdown")) {
-      if (e.pointerType === "mouse" && phase === "play") {
-        /* наведение мышью без зажатия тоже моет — так проще */
-      } else return;
-    }
+    if (phase !== "play") return;
     const c = canvasRef.current!;
     const r = c.getBoundingClientRect();
     const k = c.width / r.width;
