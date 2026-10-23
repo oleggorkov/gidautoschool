@@ -24,7 +24,7 @@ export function GameSelectionSection({ reward, onReward, onChooseTariff, onApply
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const io = new IntersectionObserver(([e]) => e.isIntersecting && setVisible(true), { threshold: 0.15 });
+    const io = new IntersectionObserver(([e]) => e?.isIntersecting && setVisible(true), { threshold: 0.15 });
     if (ref.current) io.observe(ref.current);
     return () => io.disconnect();
   }, []);

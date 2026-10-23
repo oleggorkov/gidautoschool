@@ -88,7 +88,7 @@ export function ReactionGame({ onComplete }: { onComplete: (bestMs?: number) => 
 
   const last = attempts[attempts.length - 1];
   const label =
-    light === "idle" ? "Нажми, чтобы начать попытку" : light === "red" ? "Жди зелёный…" : light === "green" ? "ЖМИ!" : attempts.length < ATTEMPTS ? `${reactionMessage(last.ms)} Нажми для следующей попытки` : reactionMessage(last.ms);
+    light === "idle" ? "Нажми, чтобы начать попытку" : light === "red" ? "Жди зелёный…" : light === "green" ? "ЖМИ!" : attempts.length < ATTEMPTS ? `${reactionMessage(last?.ms ?? null)} Нажми для следующей попытки` : reactionMessage(last?.ms ?? null);
 
   return (
     <div className="flex flex-col gap-4">
@@ -96,7 +96,7 @@ export function ReactionGame({ onComplete }: { onComplete: (bestMs?: number) => 
         <span>Попытка {Math.min(attempts.length + (light === "result" ? 0 : 1), ATTEMPTS)} из {ATTEMPTS}</span>
         <span className="flex gap-1.5">
           {Array.from({ length: ATTEMPTS }, (_, i) => (
-            <span key={i} className={`size-2.5 rounded-full ${i < attempts.length ? (attempts[i].ms === null ? "bg-destructive" : "bg-success") : "bg-stage-foreground/20"}`} />
+            <span key={i} className={`size-2.5 rounded-full ${i < attempts.length ? (attempts[i]?.ms === null ? "bg-destructive" : "bg-success") : "bg-stage-foreground/20"}`} />
           ))}
         </span>
       </div>

@@ -56,7 +56,7 @@ export function CarWashGame({ onComplete }: { onComplete: (score: number) => voi
     let cleared = 0, total = 0;
     for (let i = 3; i < data.length; i += 4 * 40) {
       total++;
-      if (data[i] < 60) cleared++;
+      if ((data[i] ?? 0) < 60) cleared++;
     }
     const pct = Math.min(100, (cleared / total) * 100 * 1.15);
     cleanRef.current = pct;
