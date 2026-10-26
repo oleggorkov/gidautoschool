@@ -44,7 +44,15 @@ export function CarWashGame({ onComplete }: { onComplete: (score: number) => voi
   }, []);
 
   function countDirt(c: HTMLCanvasElement) {
-    if (!totalRef.current) return;
+    const data = c.getContext("2d")!.getImageData(0, 0, c.width, c.height).data;
+    let n = 0;
+    for (let i = 3; i < data.length; i += 4 * 40) if ((data[i] ?? 0) >= 60) n++;
+    return n;
+  }
+
+  function measure() {
+    const c = canvasRef.current;
+    if (!c || !c.width || !totalRef.current) return;
     const left = countDirt(c);
     const pct = Math.min(100, ((totalRef.current - left) / totalRef.current) * 100 * 1.15);
     cleanRef.current = pct;
