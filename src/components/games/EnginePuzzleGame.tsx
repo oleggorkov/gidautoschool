@@ -41,33 +41,44 @@ export function EnginePuzzleGame({ onComplete }: { onComplete: () => void }) {
     }
   }
 
-  function onPointerDown(e: React.PointerEvent, id: PartId) {
-    if (placed.includes(id)) return;
+  function onPointerDown(e: React.PointerEvent<HTMLButtonElement>, id: PartId) {
+    if (placed.includes(id) || e.button > 0) return;
+    e.preventDefault(); // без выделения текста и нативного drag
+    const el = e.currentTarget;
+    el.setPointerCapture?.(e.pointerId);
     const startX = e.clientX, startY = e.clientY;
     let moved = false;
     const move = (ev: PointerEvent) => {
-      if (!moved && Math.hypot(ev.clientX - startX, ev.clientY - startY) < 8) return;
+      if (!moved && Math.hypot(ev.clientX - startX, ev.clientY - startY) < 5) return;
       moved = true;
       setDrag({ id, x: ev.clientX, y: ev.clientY });
+      const over = document.elementFromPoint(ev.clientX, ev.clientY)?.closest("[data-slot]");
+      setHover((over?.getAttribute("data-slot") as PartId | null) ?? null);
+    };
+    const cleanup = () => {
+      el.removeEventListener("pointermove", move);
+      el.removeEventListener("pointerup", up);
+      el.removeEventListener("pointercancel", cleanup);
+      setDrag(null);
+      setHover(null);
     };
     const up = (ev: PointerEvent) => {
-      window.removeEventListener("pointermove", move);
-      window.removeEventListener("pointerup", up);
-      setDrag(null);
+      cleanup();
       if (!moved) {
         setSelected((s) => (s === id ? null : id));
         return;
       }
-      const el = document.elementFromPoint(ev.clientX, ev.clientY)?.closest("[data-slot]");
-      const slot = el?.getAttribute("data-slot") as PartId | null;
+      const target = document.elementFromPoint(ev.clientX, ev.clientY)?.closest("[data-slot]");
+      const slot = target?.getAttribute("data-slot") as PartId | null;
       if (slot) tryPlace(id, slot);
       else {
         setWrong(id);
         timers.current.push(window.setTimeout(() => setWrong(null), 400));
       }
     };
-    window.addEventListener("pointermove", move);
-    window.addEventListener("pointerup", up);
+    el.addEventListener("pointermove", move);
+    el.addEventListener("pointerup", up);
+    el.addEventListener("pointercancel", cleanup);
   }
 
   if (phase === "intro")
