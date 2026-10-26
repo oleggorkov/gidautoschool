@@ -117,14 +117,14 @@ export function ReactionGame({ onComplete }: { onComplete: (bestMs?: number) => 
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[42%]" aria-hidden>
           <div className="absolute inset-x-0 bottom-0 h-[78%] bg-stage-foreground/10" />
           <div className="absolute inset-x-0 bottom-[38%] border-t-2 border-dashed border-stage-foreground/25" />
-          <img src={grayCar} alt="" width={1200} height={457} className="absolute bottom-[44%] left-[4%] w-[34%] opacity-80" />
+          <img src={grayCar} alt="" width={1200} height={457} className="absolute bottom-[44%] right-[4%] w-[34%] opacity-80" />
           <img
             src={brandCar}
             alt=""
             width={1200}
             height={457}
-            className="absolute bottom-[4%] left-[8%] w-[40%] transition-transform ease-in"
-            style={{ transform: light === "green" || (light === "result" && last?.ms != null) ? "translateX(260%)" : "translateX(0)", transitionDuration: light === "green" || light === "result" ? "1.1s" : "0s" }}
+            className="absolute bottom-[4%] right-[8%] w-[40%] transition-transform ease-in motion-reduce:transition-none"
+            style={{ transform: light === "result" && last?.ms != null ? "translateX(-260%)" : "translateX(0)", transitionDuration: light === "result" && last?.ms != null ? "1.1s" : "0s" }}
           />
         </div>
         <div className="relative z-10 flex flex-col gap-3 rounded-3xl bg-stage p-4 shadow-card">

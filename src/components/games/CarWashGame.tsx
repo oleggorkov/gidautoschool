@@ -15,17 +15,20 @@ export function CarWashGame({ onComplete }: { onComplete: (score: number) => voi
   const totalRef = useRef(0);
   const imgRef = useRef<HTMLImageElement>(null);
   const [sponge, setSponge] = useState<{ x: number; y: number } | null>(null);
+  const [ready, setReady] = useState(false);
 
   const paintDirt = useCallback(async () => {
     const c = canvasRef.current;
     const img = imgRef.current;
     if (!c || !img) return;
     await img.decode().catch(() => {});
+    if (canvasRef.current !== c) return;
     const r = c.getBoundingClientRect();
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     c.width = r.width * dpr;
     c.height = r.height * dpr;
-    const ctx = c.getContext("2d")!;
+    const ctx = c.getContext("2d");
+    if (!ctx) return;
     ctx.globalCompositeOperation = "source-over";
     ctx.fillStyle = "rgba(110, 86, 58, 0.82)";
     ctx.fillRect(0, 0, c.width, c.height);
@@ -41,33 +44,52 @@ export function CarWashGame({ onComplete }: { onComplete: (score: number) => voi
     ctx.drawImage(img, 0, 0, c.width, c.height);
     ctx.globalCompositeOperation = "source-over";
     totalRef.current = countDirt(c);
+    setReady(true);
   }, []);
 
+  useEffect(() => {
+    if (phase === "play") void paintDirt();
+  }, [phase, paintDirt]);
+
+  useEffect(() => {
+    if (phase !== "play" || !ready) return;
+    const progressTimer = window.setInterval(() => {
+      const c = canvasRef.current;
+      if (!c || !totalRef.current) return;
+      const remaining = countDirt(c);
+      const pct = Math.min(100, ((totalRef.current - remaining) / totalRef.current) * 100 * 1.15);
+      cleanRef.current = pct;
+      setClean(pct);
+    }, 100);
+    const countdown = window.setInterval(() => setLeft((value) => Math.max(0, value - 1)), 1000);
+    const finish = window.setTimeout(() => setPhase("done"), DURATION * 1000);
+    return () => {
+      window.clearInterval(progressTimer);
+      window.clearInterval(countdown);
+      window.clearTimeout(finish);
+    };
+  }, [phase, ready]);
+
   function countDirt(c: HTMLCanvasElement) {
-    const data = c.getContext("2d")!.getImageData(0, 0, c.width, c.height).data;
+    const ctx = c.getContext("2d");
+    if (!ctx) return 0;
+    const data = ctx.getImageData(0, 0, c.width, c.height).data;
     let n = 0;
     for (let i = 3; i < data.length; i += 4 * 40) if ((data[i] ?? 0) >= 60) n++;
     return n;
   }
 
-  function measure() {
-    const c = canvasRef.current;
-    if (!c || !c.width || !totalRef.current) return;
-    const left = countDirt(c);
-    const pct = Math.min(100, ((totalRef.current - left) / totalRef.current) * 100 * 1.15);
-    cleanRef.current = pct;
-    setClean(pct);
-  }
-
   function scrub(e: React.PointerEvent<HTMLCanvasElement>) {
-    if (phase !== "play") return;
-    const c = canvasRef.current!;
+    if (phase !== "play" || !ready) return;
+    const c = canvasRef.current;
+    if (!c) return;
     const box = c.getBoundingClientRect();
     setSponge({ x: e.clientX - box.left, y: e.clientY - box.top });
     const r = c.getBoundingClientRect();
     const k = c.width / r.width;
     const x = (e.clientX - r.left) * k, y = (e.clientY - r.top) * k;
-    const ctx = c.getContext("2d")!;
+    const ctx = c.getContext("2d");
+    if (!ctx) return;
     ctx.globalCompositeOperation = "destination-out";
     const rad = 42 * k;
     const from = last.current ?? { x, y };
@@ -93,6 +115,10 @@ export function CarWashGame({ onComplete }: { onComplete: (score: number) => voi
         cta="Поехали!"
         onStart={() => {
           setClean(0);
+          cleanRef.current = 0;
+          totalRef.current = 0;
+          last.current = null;
+          setReady(false);
           setLeft(DURATION);
           setPhase("play");
         }}
