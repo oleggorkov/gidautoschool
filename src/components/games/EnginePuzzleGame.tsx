@@ -24,6 +24,7 @@ export function EnginePuzzleGame({ onComplete }: { onComplete: () => void }) {
   const [selected, setSelected] = useState<PartId | null>(null);
   const [wrong, setWrong] = useState<PartId | null>(null);
   const [drag, setDrag] = useState<{ id: PartId; x: number; y: number } | null>(null);
+  const [hover, setHover] = useState<PartId | null>(null);
   const timers = useRef<number[]>([]);
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
@@ -119,7 +120,7 @@ export function EnginePuzzleGame({ onComplete }: { onComplete: () => void }) {
               onClick={() => selected && tryPlace(selected, p.id)}
               aria-label={isPlaced ? `${p.name} установлена` : `Место для детали: ${p.name}`}
               className={`absolute grid size-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-2xl border-2 transition sm:size-20 ${
-                isPlaced ? "animate-pop border-success bg-success/20 text-stage-foreground" : selected ? "border-accent border-dashed bg-accent/10 text-accent" : "border-dashed border-stage-foreground/30 text-stage-foreground/40"
+                isPlaced ? "animate-pop border-success bg-success/20 text-stage-foreground" : hover === p.id ? "scale-110 border-accent bg-accent/20 text-accent" : selected || drag ? "border-accent border-dashed bg-accent/10 text-accent" : "border-dashed border-stage-foreground/30 text-stage-foreground/40"
               }`}
               style={SLOTS[p.id]}
             >
@@ -139,7 +140,9 @@ export function EnginePuzzleGame({ onComplete }: { onComplete: () => void }) {
               onPointerDown={(e) => onPointerDown(e, p.id)}
               onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), setSelected(p.id))}
               aria-pressed={selected === p.id}
-              className={`flex flex-col items-center gap-1 rounded-xl border p-2 text-xs font-semibold transition sm:p-3 ${
+              draggable={false}
+              style={{ touchAction: "none" }}
+              className={`flex cursor-grab active:cursor-grabbing flex-col items-center gap-1 rounded-xl border p-2 text-xs font-semibold transition sm:p-3 ${
                 isPlaced ? "opacity-25" : selected === p.id ? "border-accent bg-accent/15 text-accent" : "border-stage-foreground/15 bg-stage-foreground/5 hover:bg-stage-foreground/10"
               } ${wrong === p.id ? "animate-shake border-destructive" : ""} ${drag?.id === p.id ? "opacity-40" : ""}`}
             >
@@ -151,7 +154,7 @@ export function EnginePuzzleGame({ onComplete }: { onComplete: () => void }) {
       </div>
       <p className="text-center text-sm text-stage-foreground/60">Перетащи деталь на её место — или нажми на деталь, а потом на место.</p>
       {drag && (
-        <div className="pointer-events-none fixed z-[60] -translate-x-1/2 -translate-y-1/2 rounded-xl bg-accent p-3 text-accent-foreground shadow-glow" style={{ left: drag.x, top: drag.y }}>
+        <div className="pointer-events-none fixed z-[60] -translate-x-1/2 -translate-y-1/2 scale-110 rounded-xl bg-accent p-3 text-accent-foreground shadow-glow" style={{ left: drag.x, top: drag.y }}>
           {PARTS.find((p) => p.id === drag.id)!.icon}
         </div>
       )}
