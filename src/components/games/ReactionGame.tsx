@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import raceImg from "@/assets/race.jpg";
+import brandCar from "@/assets/car-branded.png";
+import grayCar from "@/assets/car-gray.png";
 import { PROMO_CONFIG } from "@/lib/promo/config";
 import { GameIntro, GameOutro } from "./GameModal";
 
@@ -106,17 +108,31 @@ export function ReactionGame({ onComplete }: { onComplete: (bestMs?: number) => 
           press();
         }}
         onKeyDown={(e) => (e.key === " " || e.key === "Enter") && (e.preventDefault(), press())}
-        className={`no-select flex min-h-[340px] flex-col items-center justify-center gap-6 rounded-2xl border-2 p-6 transition-colors duration-150 ${
+        className={`no-select relative flex min-h-[440px] flex-col overflow-hidden items-center justify-center gap-6 rounded-2xl border-2 p-6 transition-colors duration-150 ${
           light === "green" ? "border-success bg-success/20" : light === "red" ? "border-destructive/50 bg-destructive/10" : "border-stage-foreground/15 bg-stage-foreground/5"
         }`}
         style={{ touchAction: "manipulation" }}
       >
-        <div className="flex flex-col gap-3 rounded-3xl bg-stage p-4 shadow-card">
+        {/* дорога с двумя машинами на заднем плане */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[42%]" aria-hidden>
+          <div className="absolute inset-x-0 bottom-0 h-[78%] bg-stage-foreground/10" />
+          <div className="absolute inset-x-0 bottom-[38%] border-t-2 border-dashed border-stage-foreground/25" />
+          <img src={grayCar} alt="" width={1200} height={457} className="absolute bottom-[44%] left-[4%] w-[34%] opacity-80" />
+          <img
+            src={brandCar}
+            alt=""
+            width={1200}
+            height={457}
+            className="absolute bottom-[4%] left-[8%] w-[40%] transition-transform ease-in"
+            style={{ transform: light === "green" || (light === "result" && last?.ms != null) ? "translateX(260%)" : "translateX(0)", transitionDuration: light === "green" || light === "result" ? "1.1s" : "0s" }}
+          />
+        </div>
+        <div className="relative z-10 flex flex-col gap-3 rounded-3xl bg-stage p-4 shadow-card">
           <span className={`size-14 rounded-full transition ${light === "red" ? "bg-destructive shadow-[0_0_30px_var(--destructive)]" : "bg-destructive/20"}`} />
           <span className="size-14 rounded-full bg-accent/15" />
           <span className={`size-14 rounded-full transition ${light === "green" ? "bg-success shadow-[0_0_30px_var(--success)]" : "bg-success/20"}`} />
         </div>
-        <span key={label} className="animate-rise max-w-sm text-center font-display text-lg font-semibold" aria-live="polite">{label}</span>
+        <span key={label} className="animate-rise relative z-10 mb-24 max-w-sm rounded-xl bg-stage/70 px-3 py-1 text-center font-display text-lg font-semibold" aria-live="polite">{label}</span>
       </button>
     </div>
   );
