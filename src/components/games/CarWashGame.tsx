@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Timer } from "lucide-react";
-import carImg from "@/assets/car-branded.png";
+import carImg from "@/assets/car-autogid.png";
+import { WASH_DURATION_SECONDS, WASH_BRUSH_RADIUS, WASH_BRUSH_STRENGTH } from "@/lib/game-rules";
+import { paintRoadDirt } from "@/lib/car-wash-dirt";
 import { GameIntro, GameOutro, ProgressBar } from "./GameModal";
 
-const DURATION = 20;
+const DURATION = WASH_DURATION_SECONDS;
 
 export function CarWashGame({ onComplete }: { onComplete: (score: number) => void }) {
   const [phase, setPhase] = useState<"intro" | "play" | "done">("intro");
@@ -29,20 +31,8 @@ export function CarWashGame({ onComplete }: { onComplete: (score: number) => voi
     c.height = r.height * dpr;
     const ctx = c.getContext("2d");
     if (!ctx) return;
-    ctx.globalCompositeOperation = "source-over";
-    ctx.fillStyle = "rgba(110, 86, 58, 0.82)";
-    ctx.fillRect(0, 0, c.width, c.height);
-    for (let i = 0; i < 260; i++) {
-      const x = Math.random() * c.width, y = Math.random() * c.height, rad = (8 + Math.random() * 40) * dpr;
-      ctx.fillStyle = `rgba(${70 + Math.random() * 50}, ${55 + Math.random() * 35}, ${35 + Math.random() * 25}, ${0.25 + Math.random() * 0.5})`;
-      ctx.beginPath();
-      ctx.arc(x, y, rad, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    // оставляем грязь только на кузове (по силуэту машины)
-    ctx.globalCompositeOperation = "destination-in";
-    ctx.drawImage(img, 0, 0, c.width, c.height);
-    ctx.globalCompositeOperation = "source-over";
+    const tokens = getComputedStyle(c);
+    paintRoadDirt(c, img, tokens.getPropertyValue("--road-dust").trim(), tokens.getPropertyValue("--road-mud").trim());
     totalRef.current = countDirt(c);
     setReady(true);
   }, []);
@@ -57,7 +47,7 @@ export function CarWashGame({ onComplete }: { onComplete: (score: number) => voi
       const c = canvasRef.current;
       if (!c || !totalRef.current) return;
       const remaining = countDirt(c);
-      const pct = Math.min(100, ((totalRef.current - remaining) / totalRef.current) * 100 * 1.15);
+      const pct = Math.min(100, ((totalRef.current - remaining) / totalRef.current) * 100);
       cleanRef.current = pct;
       setClean(pct);
     }, 100);
@@ -75,7 +65,7 @@ export function CarWashGame({ onComplete }: { onComplete: (score: number) => voi
     if (!ctx) return 0;
     const data = ctx.getImageData(0, 0, c.width, c.height).data;
     let n = 0;
-    for (let i = 3; i < data.length; i += 4 * 40) if ((data[i] ?? 0) >= 60) n++;
+    for (let i = 3; i < data.length; i += 4 * 40) n += (data[i] ?? 0) / 255;
     return n;
   }
 
@@ -91,13 +81,13 @@ export function CarWashGame({ onComplete }: { onComplete: (score: number) => voi
     const ctx = c.getContext("2d");
     if (!ctx) return;
     ctx.globalCompositeOperation = "destination-out";
-    const rad = 42 * k;
+    const rad = WASH_BRUSH_RADIUS * k;
     const from = last.current ?? { x, y };
     const steps = Math.max(1, Math.hypot(x - from.x, y - from.y) / (rad / 3));
     for (let i = 0; i <= steps; i++) {
       const px = from.x + ((x - from.x) * i) / steps, py = from.y + ((y - from.y) * i) / steps;
       const g = ctx.createRadialGradient(px, py, 0, px, py, rad);
-      g.addColorStop(0, "rgba(0,0,0,0.9)");
+      g.addColorStop(0, `rgba(0,0,0,${WASH_BRUSH_STRENGTH})`);
       g.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = g;
       ctx.beginPath();
@@ -111,7 +101,7 @@ export function CarWashGame({ onComplete }: { onComplete: (score: number) => voi
     return (
       <GameIntro
         title="Эта красотка заслуживает блеска!"
-        text="У тебя есть 20 секунд, чтобы отмыть автомобиль. Веди губкой по кузову и смотри, как он преображается."
+        text="У тебя есть 35 секунд на дорожную пыль и въевшуюся грязь. Эта красотка заслуживает заботы."
         cta="Поехали!"
         onStart={() => {
           setClean(0);
@@ -122,13 +112,13 @@ export function CarWashGame({ onComplete }: { onComplete: (score: number) => voi
           setLeft(DURATION);
           setPhase("play");
         }}
-        visual={<img src={carImg} alt="Грязный автомобиль" width={1200} height={457} className="w-full max-w-lg rounded-2xl opacity-90 sepia saturate-50 brightness-75" />}
+        visual={<img src={carImg} alt="Грязный автомобиль" width={1200} height={457} className="w-full max-w-lg rounded-lg opacity-90" />}
       />
     );
 
   if (phase === "done")
     return (
-      <GameOutro title="Вот это блеск!" text="Ты навёл порядок — теперь наведи порядок со своими планами и получи скидку на обучение в ГИД." onClaim={() => onComplete(cleanRef.current)}>
+      <GameOutro title="Вот это блеск!" text="Ты навёл порядок — теперь наведи порядок со своими планами и получи скидку на обучение в Автогид." onClaim={() => onComplete(cleanRef.current)}>
         <div className="relative w-full max-w-lg overflow-hidden rounded-2xl">
           <img src={carImg} alt="Чистый автомобиль" width={1200} height={457} className="w-full" />
           <div className="animate-sheen pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-card/70 to-transparent" />
@@ -156,7 +146,11 @@ export function CarWashGame({ onComplete }: { onComplete: (score: number) => voi
             last.current = null;
             scrub(e);
           }}
-          onPointerMove={scrub}
+          onPointerMove={(e) => {
+            const box = e.currentTarget.getBoundingClientRect();
+            setSponge({ x: e.clientX - box.left, y: e.clientY - box.top });
+            if (e.pointerType === "mouse" || e.currentTarget.hasPointerCapture(e.pointerId)) scrub(e);
+          }}
           onPointerUp={() => (last.current = null)}
           onPointerLeave={() => {
             last.current = null;
@@ -165,13 +159,13 @@ export function CarWashGame({ onComplete }: { onComplete: (score: number) => voi
         />
         {sponge && (
           <svg viewBox="0 0 64 48" className="pointer-events-none absolute w-16 -translate-x-1/2 -translate-y-1/2 drop-shadow-lg" style={{ left: sponge.x, top: sponge.y }} aria-hidden>
-            <rect x="4" y="8" width="56" height="34" rx="10" fill="#f5c84c" />
-            <rect x="4" y="8" width="56" height="12" rx="6" fill="#3fa36b" />
+            <rect x="4" y="8" width="56" height="34" rx="10" fill="var(--sponge-foam)" />
+            <rect x="4" y="8" width="56" height="12" rx="6" fill="var(--sponge-pad)" />
             {[14, 26, 40, 50, 20, 34, 46].map((cx, i) => (
-              <circle key={i} cx={cx} cy={i < 4 ? 28 : 36} r="2.4" fill="#d9a92e" />
+              <circle key={i} cx={cx} cy={i < 4 ? 28 : 36} r="2.4" fill="var(--sponge-pore)" />
             ))}
-            <circle cx="12" cy="6" r="4" fill="#fff" opacity=".85" />
-            <circle cx="52" cy="4" r="3" fill="#fff" opacity=".7" />
+            <circle cx="12" cy="6" r="4" fill="var(--card)" opacity=".85" />
+            <circle cx="52" cy="4" r="3" fill="var(--card)" opacity=".7" />
           </svg>
         )}
         </div>

@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from "react";
+import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 
 export function GameModal({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
@@ -16,7 +17,7 @@ export function GameModal({ title, onClose, children }: { title: string; onClose
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-stretch justify-center bg-stage/70 backdrop-blur-sm sm:items-center sm:p-6" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-stretch justify-center bg-overlay/60 backdrop-blur-sm sm:items-center sm:p-6" onClick={onClose}>
       <div
         ref={ref}
         tabIndex={-1}
@@ -24,13 +25,13 @@ export function GameModal({ title, onClose, children }: { title: string; onClose
         aria-modal="true"
         aria-label={title}
         onClick={(e) => e.stopPropagation()}
-        className="animate-pop relative flex w-full flex-col overflow-y-auto bg-stage-gradient text-stage-foreground outline-none sm:max-h-[92vh] sm:max-w-3xl sm:rounded-3xl sm:shadow-card"
+        className="animate-pop relative flex w-full flex-col overflow-y-auto bg-stage-gradient text-stage-foreground outline-none sm:max-h-[92vh] sm:max-w-3xl sm:rounded-lg sm:shadow-card"
       >
         <div className="flex items-center justify-between gap-4 border-b border-stage-foreground/10 px-5 py-3">
           <span className="font-display text-sm tracking-wide text-stage-foreground/80">{title}</span>
-          <button onClick={onClose} aria-label="Закрыть игру" className="rounded-full p-2 text-stage-foreground/80 transition hover:bg-stage-foreground/10 hover:text-stage-foreground focus-visible:ring-2 focus-visible:ring-ring">
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Закрыть игру" className="rounded-full p-2 text-stage-foreground/80 transition hover:bg-stage-foreground/10 hover:text-stage-foreground focus-visible:ring-2 focus-visible:ring-ring">
             <X className="size-5" />
-          </button>
+          </Button>
         </div>
         <div className="flex-1 p-5 sm:p-8">{children}</div>
       </div>
@@ -44,9 +45,9 @@ export function GameIntro({ title, text, cta, onStart, visual }: { title: string
       {visual}
       <h3 className="mt-6 text-2xl font-bold sm:text-3xl">{title}</h3>
       <p className="mt-3 max-w-md text-stage-foreground/75">{text}</p>
-      <button onClick={onStart} className="mt-7 h-12 rounded-xl bg-accent px-8 font-bold text-accent-foreground shadow-glow transition hover:brightness-105 active:scale-95">
+      <Button onClick={onStart} className="mt-7 h-12 rounded-xl bg-accent px-8 font-bold text-accent-foreground shadow-glow transition hover:brightness-105 active:scale-95">
         {cta}
-      </button>
+      </Button>
     </div>
   );
 }
@@ -57,9 +58,9 @@ export function GameOutro({ title, text, onClaim, children }: { title: string; t
       {children}
       <h3 className="mt-6 text-2xl font-bold sm:text-3xl">{title}</h3>
       <p className="mt-3 max-w-md text-stage-foreground/75">{text}</p>
-      <button onClick={onClaim} className="mt-7 h-12 rounded-xl bg-accent px-8 font-bold text-accent-foreground shadow-glow transition hover:brightness-105 active:scale-95">
+      <Button onClick={onClaim} className="mt-7 h-12 rounded-xl bg-accent px-8 font-bold text-accent-foreground shadow-glow transition hover:brightness-105 active:scale-95">
         Забрать скидку
-      </button>
+      </Button>
     </div>
   );
 }
