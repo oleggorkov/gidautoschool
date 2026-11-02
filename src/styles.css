@@ -156,13 +156,13 @@
 }
 .road-car { position: absolute; width: 48%; }
 .road-car::after { content: ""; position: absolute; left: 4%; right: 4%; bottom: 1%; height: 6%; background: var(--car-shadow); filter: blur(3px); border-radius: 50%; z-index: -1; }
-.car-wheel { position: absolute; width: 15.8%; aspect-ratio: 1; border-radius: 50%; }
-.road-car-brand .car-wheel { top: 60.9%; }
-.road-car-brand .wheel-front { left: 10.7%; }
-.road-car-brand .wheel-rear { left: 71.4%; }
-.road-car-gray .car-wheel { top: 60.1%; width: 13.5%; }
-.road-car-gray .wheel-front { left: 11.8%; }
-.road-car-gray .wheel-rear { left: 74.2%; }
+.car-wheel { position: absolute; width: 12.5%; aspect-ratio: 1; border-radius: 50%; }
+.road-car-brand .car-wheel { top: 60.75%; }
+.road-car-brand .wheel-front { left: 12.42%; }
+.road-car-brand .wheel-rear { left: 73.4%; }
+.road-car-gray .car-wheel { top: 62.8%; width: 12%; }
+.road-car-gray .wheel-front { left: 12.42%; }
+.road-car-gray .wheel-rear { left: 74.67%; }
 .road-car-brand { right: 4%; bottom: 7%; z-index: 2; }
 .road-car-gray { right: 8%; bottom: 51%; width: 39%; z-index: 1; }
 .road-car.launch { animation: car-launch 1.8s cubic-bezier(.62,.03,.95,.6) forwards; }
