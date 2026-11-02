@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import { Volume2, VolumeX } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import raceImg from "@/assets/race.jpg";
-import brandCar from "@/assets/car-branded.png";
+import brandCar from "@/assets/car-autogid.png";
 import grayCar from "@/assets/car-gray.png";
+import brandWheel from "@/assets/wheel-autogid.png";
+import grayWheel from "@/assets/wheel-gray.png";
+import squeal from "@/assets/tire-squeal.mp3.asset.json";
 import { PROMO_CONFIG } from "@/lib/promo/config";
 import { GameIntro, GameOutro } from "./GameModal";
 
@@ -24,8 +29,10 @@ export function ReactionGame({ onComplete }: { onComplete: (bestMs?: number) => 
   const greenAt = useRef(0);
   const timer = useRef<number | undefined>(undefined);
   const busy = useRef(false);
+  const [muted, setMuted] = useState(false);
+  const audio = useRef<HTMLAudioElement | null>(null);
 
-  useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(() => () => { clearTimeout(timer.current); audio.current?.pause(); }, []);
 
   function startAttempt() {
     if (busy.current) return;
@@ -43,7 +50,7 @@ export function ReactionGame({ onComplete }: { onComplete: (bestMs?: number) => 
     const next = [...attempts, a];
     setAttempts(next);
     setLight("result");
-    if (next.length >= ATTEMPTS) timer.current = window.setTimeout(() => setPhase("done"), 1400);
+    if (next.length >= ATTEMPTS) timer.current = window.setTimeout(() => setPhase("done"), 2200);
   }
 
   function press() {
@@ -51,6 +58,12 @@ export function ReactionGame({ onComplete }: { onComplete: (bestMs?: number) => 
       clearTimeout(timer.current);
       record({ ms: null });
     } else if (light === "green") {
+      if (!muted) {
+        if (!audio.current) audio.current = new Audio(squeal.url);
+        audio.current.currentTime = 0;
+        audio.current.volume = 0.35;
+        void audio.current.play().catch(() => {});
+      }
       record({ ms: Math.max(1, Math.round(performance.now() - greenAt.current)) });
     } else if (light === "idle" || (light === "result" && attempts.length < ATTEMPTS)) {
       startAttempt();
@@ -82,7 +95,7 @@ export function ReactionGame({ onComplete }: { onComplete: (bestMs?: number) => 
           <div className="text-xs font-semibold uppercase tracking-widest text-stage-foreground/60">Лучший результат</div>
           <div className="font-display text-4xl font-bold text-accent">{best !== undefined ? `${best} мс` : "—"}</div>
           <div className="mt-1 text-xs text-stage-foreground/60">
-            {best !== undefined && best <= PROMO_CONFIG.reactionBenchmarkMs ? "Быстрее игрового рекорда ГИД" : `Игровой рекорд ГИД: ${PROMO_CONFIG.reactionBenchmarkMs} мс`}
+            {best !== undefined && best <= PROMO_CONFIG.reactionBenchmarkMs ? "Быстрее игрового рекорда Автогид" : `Игровой рекорд Автогид: ${PROMO_CONFIG.reactionBenchmarkMs} мс`}
           </div>
         </div>
       </GameOutro>
@@ -102,38 +115,36 @@ export function ReactionGame({ onComplete }: { onComplete: (bestMs?: number) => 
           ))}
         </span>
       </div>
-      <button
+      <Button variant="ghost" aria-label="Поле реакции"
         onPointerDown={(e) => {
           e.preventDefault();
           press();
         }}
         onKeyDown={(e) => (e.key === " " || e.key === "Enter") && (e.preventDefault(), press())}
-        className={`no-select relative flex min-h-[440px] flex-col overflow-hidden items-center justify-center gap-6 rounded-2xl border-2 p-6 transition-colors duration-150 ${
+        className={`reaction-stage no-select relative flex h-auto min-h-[440px] w-full whitespace-normal flex-col overflow-hidden items-center justify-center gap-6 rounded-2xl border-2 p-6 transition-colors duration-150 ${
           light === "green" ? "border-success bg-success/20" : light === "red" ? "border-destructive/50 bg-destructive/10" : "border-stage-foreground/15 bg-stage-foreground/5"
         }`}
         style={{ touchAction: "manipulation" }}
       >
-        {/* дорога с двумя машинами на заднем плане */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[42%]" aria-hidden>
-          <div className="absolute inset-x-0 bottom-0 h-[78%] bg-stage-foreground/10" />
-          <div className="absolute inset-x-0 bottom-[38%] border-t-2 border-dashed border-stage-foreground/25" />
-          <img src={grayCar} alt="" width={1200} height={457} className="absolute bottom-[44%] right-[4%] w-[34%] opacity-80" />
-          <img
-            src={brandCar}
-            alt=""
-            width={1200}
-            height={457}
-            className="absolute bottom-[4%] right-[8%] w-[40%] transition-transform ease-in motion-reduce:transition-none"
-            style={{ transform: light === "result" && last?.ms != null ? "translateX(-260%)" : "translateX(0)", transitionDuration: light === "result" && last?.ms != null ? "1.1s" : "0s" }}
-          />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[43%]" aria-hidden>
+          <div className="road-surface absolute inset-0" />
+          <div className="absolute inset-x-0 bottom-[45%] border-t-2 border-dashed border-road-line/60" />
+          {[{ src: grayCar, wheel: grayWheel, cls: "road-car-gray" }, { src: brandCar, wheel: brandWheel, cls: "road-car-brand" }].map(car => (
+            <div key={car.cls} className={`road-car ${car.cls} ${light === "result" && last?.ms != null ? "launch" : ""}`}>
+              <img src={car.src} alt="" className="car-body w-full" />
+              <img src={car.wheel} alt="" className="car-wheel wheel-front" />
+              <img src={car.wheel} alt="" className="car-wheel wheel-rear" />
+            </div>
+          ))}
         </div>
-        <div className="relative z-10 flex flex-col gap-3 rounded-3xl bg-stage p-4 shadow-card">
-          <span className={`size-14 rounded-full transition ${light === "red" ? "bg-destructive shadow-[0_0_30px_var(--destructive)]" : "bg-destructive/20"}`} />
-          <span className="size-14 rounded-full bg-accent/15" />
-          <span className={`size-14 rounded-full transition ${light === "green" ? "bg-success shadow-[0_0_30px_var(--success)]" : "bg-success/20"}`} />
+        <div className="traffic-housing absolute left-[8%] top-6 z-10 flex flex-col gap-2 rounded-lg p-3 shadow-card">
+          <span className={`size-10 rounded-full transition ${light === "red" ? "bg-destructive shadow-[0_0_30px_var(--destructive)]" : "bg-destructive/20"}`} />
+          <span className="traffic-yellow size-10 rounded-full opacity-20" />
+          <span className={`size-10 rounded-full transition ${light === "green" ? "bg-success shadow-[0_0_30px_var(--success)]" : "bg-success/20"}`} />
         </div>
-        <span key={label} className="animate-rise relative z-10 mb-24 max-w-sm rounded-xl bg-stage/70 px-3 py-1 text-center font-display text-lg font-semibold" aria-live="polite">{label}</span>
-      </button>
+        <span key={label} className="animate-rise absolute right-4 top-10 z-10 w-[65%] max-w-sm rounded-lg bg-stage/90 px-3 py-2 text-center font-display text-lg font-semibold" aria-live="polite">{label}</span>
+      </Button>
+      <Button variant="ghost" size="icon" className="self-end" title={muted ? "Включить звук" : "Выключить звук"} aria-label={muted ? "Включить звук" : "Выключить звук"} onClick={() => { setMuted(!muted); audio.current?.pause(); }}>{muted ? <VolumeX /> : <Volume2 />}</Button>
     </div>
   );
 }
