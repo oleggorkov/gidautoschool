@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import { Volume2, VolumeX } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import raceImg from "@/assets/race.jpg";
-import brandCar from "@/assets/car-branded.png";
+import brandCar from "@/assets/car-autogid.png";
 import grayCar from "@/assets/car-gray.png";
+import brandWheel from "@/assets/wheel-autogid.png";
+import grayWheel from "@/assets/wheel-gray.png";
+import squeal from "@/assets/tire-squeal.mp3.asset.json";
 import { PROMO_CONFIG } from "@/lib/promo/config";
 import { GameIntro, GameOutro } from "./GameModal";
 
@@ -24,8 +29,10 @@ export function ReactionGame({ onComplete }: { onComplete: (bestMs?: number) => 
   const greenAt = useRef(0);
   const timer = useRef<number | undefined>(undefined);
   const busy = useRef(false);
+  const [muted, setMuted] = useState(false);
+  const audio = useRef<HTMLAudioElement | null>(null);
 
-  useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(() => () => { clearTimeout(timer.current); audio.current?.pause(); }, []);
 
   function startAttempt() {
     if (busy.current) return;
@@ -43,7 +50,7 @@ export function ReactionGame({ onComplete }: { onComplete: (bestMs?: number) => 
     const next = [...attempts, a];
     setAttempts(next);
     setLight("result");
-    if (next.length >= ATTEMPTS) timer.current = window.setTimeout(() => setPhase("done"), 1400);
+    if (next.length >= ATTEMPTS) timer.current = window.setTimeout(() => setPhase("done"), 2200);
   }
 
   function press() {
@@ -51,6 +58,12 @@ export function ReactionGame({ onComplete }: { onComplete: (bestMs?: number) => 
       clearTimeout(timer.current);
       record({ ms: null });
     } else if (light === "green") {
+      if (!muted) {
+        if (!audio.current) audio.current = new Audio(squeal.url);
+        audio.current.currentTime = 0;
+        audio.current.volume = 0.35;
+        void audio.current.play().catch(() => {});
+      }
       record({ ms: Math.max(1, Math.round(performance.now() - greenAt.current)) });
     } else if (light === "idle" || (light === "result" && attempts.length < ATTEMPTS)) {
       startAttempt();
