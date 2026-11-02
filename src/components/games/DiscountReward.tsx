@@ -24,7 +24,7 @@ export function DiscountReward({ reward, repeat }: { reward: Reward; repeat?: bo
         <div className="mt-2 text-sm font-medium">Применяй бонус при записи на обучение</div>
         <div className="mt-5 flex flex-wrap items-center justify-between gap-2 rounded-lg border-2 border-dashed border-accent-foreground/30 px-4 py-3">
           <span className="font-display text-lg font-bold tracking-wider">{reward.code}</span>
-          <Button variant="secondary" size="icon" title= aria-label="Скопировать промокод" onClick={copy} className="flex items-center gap-1 rounded-lg bg-accent-foreground px-3 py-1.5 text-xs font-bold text-accent transition active:scale-95">
+          <Button variant="secondary" size="icon" title={copied ? "Скопировано" : "Скопировать промокод"} aria-label="Скопировать промокод" onClick={copy}>
             {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
             
           </Button>
