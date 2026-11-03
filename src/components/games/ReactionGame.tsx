@@ -115,17 +115,7 @@ export function ReactionGame({ onComplete }: { onComplete: (bestMs?: number) => 
           ))}
         </span>
       </div>
-      <Button variant="ghost" aria-label="Поле реакции"
-        onPointerDown={(e) => {
-          e.preventDefault();
-          press();
-        }}
-        onKeyDown={(e) => (e.key === " " || e.key === "Enter") && (e.preventDefault(), press())}
-        className={`reaction-stage no-select relative flex h-auto min-h-[440px] w-full whitespace-normal flex-col overflow-hidden items-center justify-center gap-6 rounded-2xl border-2 p-6 transition-colors duration-150 ${
-          light === "green" ? "border-success bg-success/20" : light === "red" ? "border-destructive/50 bg-destructive/10" : "border-stage-foreground/15 bg-stage-foreground/5"
-        }`}
-        style={{ touchAction: "manipulation" }}
-      >
+      <div className="reaction-stage no-select relative min-h-[440px] w-full overflow-hidden rounded-2xl border-2 border-border bg-muted">
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[43%]" aria-hidden>
           <div className="road-surface absolute inset-0" />
           <div className="absolute inset-x-0 bottom-[45%] border-t-2 border-dashed border-road-line/60" />
@@ -142,8 +132,14 @@ export function ReactionGame({ onComplete }: { onComplete: (bestMs?: number) => 
           <span className="traffic-yellow size-10 rounded-full opacity-20" />
           <span className={`size-10 rounded-full transition ${light === "green" ? "bg-success shadow-[0_0_30px_var(--success)]" : "bg-success/20"}`} />
         </div>
-        <span key={label} className="animate-rise absolute right-4 top-10 z-10 w-[65%] max-w-sm rounded-lg bg-stage/90 px-3 py-2 text-center font-display text-lg font-semibold" aria-live="polite">{label}</span>
-      </Button>
+        <div className="absolute right-4 top-8 z-10 flex w-[65%] max-w-sm flex-col items-center gap-4">
+          <span key={label} className="animate-rise text-center font-display text-lg font-semibold" aria-live="polite">{label}</span>
+          <Button aria-label="Кнопка реакции" onClick={press} disabled={light === "result" && attempts.length >= ATTEMPTS}
+            className={`h-14 w-full max-w-48 whitespace-normal font-display text-lg transition-colors active:bg-foreground active:text-background ${light === "green" ? "bg-success text-primary-foreground hover:bg-success/90" : light === "result" ? "bg-secondary text-secondary-foreground hover:bg-secondary/80" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}>
+            {light === "idle" ? "Старт" : light === "red" ? "Жди…" : light === "green" ? "ЖМИ!" : attempts.length < ATTEMPTS ? "Ещё попытка" : "Готово"}
+          </Button>
+        </div>
+      </div>
       <Button variant="ghost" size="icon" className="self-end" title={muted ? "Включить звук" : "Выключить звук"} aria-label={muted ? "Включить звук" : "Выключить звук"} onClick={() => { setMuted(!muted); audio.current?.pause(); }}>{muted ? <VolumeX /> : <Volume2 />}</Button>
     </div>
   );
