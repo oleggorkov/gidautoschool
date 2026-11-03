@@ -101,7 +101,7 @@ export function CarWashGame({ onComplete }: { onComplete: (score: number) => voi
     return (
       <GameIntro
         title="Эта красотка заслуживает блеска!"
-        text="У тебя есть 35 секунд на дорожную пыль и въевшуюся грязь. Эта красотка заслуживает заботы."
+        text="У тебя есть 20 секунд на дорожную пыль и въевшуюся грязь. Эта красотка заслуживает заботы."
         cta="Поехали!"
         onStart={() => {
           setClean(0);

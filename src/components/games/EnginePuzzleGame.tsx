@@ -50,7 +50,7 @@ export function EnginePuzzleGame({ onComplete }: { onComplete: () => void }) {
       </div>
     </div>
     <div className="grid grid-cols-6 gap-1 sm:gap-2">
-      {ORDER.map(id => <Button key={id} variant="ghost" aria-label={`Фрагмент ${id + 1}`} aria-pressed={selected === id} disabled={placed.includes(id)} draggable={false} className={`puzzle-piece aspect-square h-auto w-full cursor-grab p-0 active:cursor-grabbing ${selected === id ? "ring-2 ring-primary" : ""} ${placed.includes(id) ? "opacity-15" : ""} ${wrong === id ? "animate-shake" : ""}`} onClick={() => setSelected(id)}
+      {ORDER.map(id => <Button key={id} variant="ghost" aria-label={`Фрагмент ${id + 1}`} aria-pressed={selected === id} disabled={placed.includes(id)} draggable={false} className={`puzzle-piece aspect-square h-auto w-full cursor-grab p-0 [&_svg]:size-12 active:cursor-grabbing ${selected === id ? "ring-2 ring-primary" : ""} ${placed.includes(id) ? "opacity-15" : ""} ${wrong === id ? "animate-shake" : ""}`} onClick={() => setSelected(id)}
         onPointerDown={e => { if (e.button > 0) return; e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); setSelected(id); }}
         onPointerMove={e => { if (!e.currentTarget.hasPointerCapture(e.pointerId)) return; setDrag({ id, x: e.clientX, y: e.clientY }); setHover(targetAt(e.clientX, e.clientY)); }}
         onPointerUp={e => { const slot = targetAt(e.clientX, e.clientY); if (slot !== null) place(id, slot); setDrag(null); setHover(null); }}

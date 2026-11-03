@@ -14,7 +14,7 @@ import { ReactionGame } from "./ReactionGame";
 import { DiscountReward } from "./DiscountReward";
 
 const GAMES = [
-  { id: "carwash" as const, title: "Отмой эту красотку", text: "Дорожная пыль, брызги и немного твоего терпения", time: "35 секунд", cta: "Начать мойку", img: carImg },
+  { id: "carwash" as const, title: "Отмой эту красотку", text: "Дорожная пыль, брызги и немного твоего терпения", time: "20 секунд", cta: "Начать мойку", img: carImg },
   { id: "engine" as const, title: "Собери двигатель", text: "Соедини 12 фрагментов в один работающий замысел", time: "12 фрагментов", cta: "Собрать двигатель", img: engineImg },
   { id: "reaction" as const, title: "Обгони инструктора", text: "Зелёный свет. Быстрый старт. Всё решает реакция", time: "3 попытки", cta: "Проверить реакцию", img: raceImg },
 ];

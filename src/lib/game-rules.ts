@@ -1,4 +1,4 @@
-export const WASH_DURATION_SECONDS = 35;
+export const WASH_DURATION_SECONDS = 20;
 export const WASH_BRUSH_RADIUS = 28;
 export const WASH_BRUSH_STRENGTH = 0.18;
 export const PUZZLE_COLUMNS = 4;

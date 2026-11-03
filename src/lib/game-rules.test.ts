@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { canPlacePiece, PUZZLE_PIECES, WASH_BRUSH_RADIUS, WASH_BRUSH_STRENGTH, WASH_DURATION_SECONDS } from "./game-rules";
 
 describe("requested game rules", () => {
-  it("allows longer washing than the original 20 seconds", () => {
-    expect(WASH_DURATION_SECONDS).toBeGreaterThan(20);
+  it("gives exactly 20 seconds to wash the car", () => {
+    expect(WASH_DURATION_SECONDS).toBe(20);
   });
   it("requires more scrubbing than the original large strong brush", () => {
     expect(WASH_BRUSH_RADIUS).toBeLessThan(42);
