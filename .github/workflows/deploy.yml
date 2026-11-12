@@ -33,8 +33,22 @@ jobs:
 
       - name: Fix SPA routing and bypass Jekyll
         run: |
-          # TanStack Start должен собрать всё в .output/public
-          cd ./.output/public
+          # Ищем, в какую папку Vite сложил index.html
+          if [ -f "./dist/client/index.html" ]; then
+            BUILD_DIR="./dist/client"
+          elif [ -f "./.output/public/index.html" ]; then
+            BUILD_DIR="./.output/public"
+          elif [ -f "./dist/index.html" ]; then
+            BUILD_DIR="./dist"
+          else
+            echo "❌ ОШИБКА: index.html не найден в стандартных папках!"
+            exit 1
+          fi
+          
+          echo "✅ Нашли index.html в папке: $BUILD_DIR"
+          echo "BUILD_DIR=$BUILD_DIR" >> $GITHUB_ENV
+          
+          cd "$BUILD_DIR"
           cp index.html 404.html
           touch .nojekyll
 
@@ -44,7 +58,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './.output/public'
+          # Загружаем ту папку, которую нашли на предыдущем шаге
+          path: ${{ env.BUILD_DIR }}
 
       - name: Deploy to GitHub Pages
         id: deployment
