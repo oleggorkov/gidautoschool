@@ -7,7 +7,7 @@ export const getRouter = () => {
 
   const router = createRouter({
     routeTree,
-    basepath: '/gidautoschool',
+    basepath: '/gidautoschool/',
     context: { queryClient },
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
