@@ -11,18 +11,18 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
   tanstackStart: {
-    server: { entry: "server" }, // Это ссылается на ваш src/server.ts
+    server: { entry: "server" },
     prerender: {
       enabled: true,
       autoSubfolderIndex: true,
       autoStaticPathsDiscovery: true,
-      crawlLinks: true, // Обязательно, чтобы краулер искал ссылки
+      crawlLinks: true, // 👈 Важно: заставляет краулер искать ссылки для пререндера
     },
   },
   vite: {
     base: '/gidautoschool/',
   },
   nitro: {
-    preset: 'static', 
-  }
+    preset: 'static',
+  },
 });
