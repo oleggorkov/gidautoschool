@@ -20,6 +20,9 @@ export default defineConfig({
     react(),
   ],
   base: '/gidautoschool/',
+  css: {
+      postcss: {}, 
+    },
   nitro: { preset: 'static' },
   build: {
     cssMinify: false, // Отключаем минификатор CSS, чтобы обойти баг Vite 8 + Tailwind
