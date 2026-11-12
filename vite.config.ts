@@ -11,17 +11,25 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
   tanstackStart: {
-    // Включаем SPA-режим
-    spa: {
+    server: { entry: "server" },
+    // Отключаем автоматический обход, чтобы избежать ошибки 404
+    prerender: {
       enabled: true,
-      prerender: {
-        enabled: true, // Оставляем, чтобы сгенерировать оболочку
-        // outputPath: '_shell.html', // Можно раскомментировать, если нужно
-      },
+      crawlLinks: false, 
     },
   },
   vite: {
     base: '/gidautoschool/',
+    // 👇 Явно указываем серверный вход для Vite
+    environments: {
+      ssr: {
+        build: {
+          rollupOptions: {
+            input: './src/server.ts',
+          },
+        },
+      },
+    },
   },
   nitro: {
     preset: 'static',
