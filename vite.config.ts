@@ -20,6 +20,9 @@ export default defineConfig({
     react(),
   ],
   base: '/gidautoschool/',
+  ssr: {
+      noExternal: true,
+    },
   css: {
       postcss: {}, 
     },
