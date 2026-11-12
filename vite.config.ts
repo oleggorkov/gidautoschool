@@ -21,4 +21,7 @@ export default defineConfig({
   ],
   base: '/gidautoschool/',
   nitro: { preset: 'static' },
+  build: {
+    cssMinify: 'esbuild',
+  },
 });
