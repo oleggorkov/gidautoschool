@@ -33,33 +33,8 @@ jobs:
 
       - name: Fix SPA routing and bypass Jekyll
         run: |
-          # Определяем папку сборки
-          if [ -d "./dist/client/assets" ]; then
-            BUILD_DIR="./dist/client"
-          elif [ -d "./.output/public/assets" ]; then
-            BUILD_DIR="./.output/public"
-          elif [ -d "./dist/assets" ]; then
-            BUILD_DIR="./dist"
-          else
-            echo "❌ ОШИБКА: Папка с ассетами (assets) не найдена!"
-            exit 1
-          fi
-          
-          echo "✅ Папка сборки: $BUILD_DIR"
-          echo "BUILD_DIR=$BUILD_DIR" >> $GITHUB_ENV
-          
-          # Если index.html нет в папке сборки, копируем его из корня проекта
-          if [ ! -f "$BUILD_DIR/index.html" ]; then
-            if [ -f "./index.html" ]; then
-              echo "Копируем index.html из корня в $BUILD_DIR"
-              cp ./index.html "$BUILD_DIR/index.html"
-            else
-              echo "❌ ОШИБКА: index.html не найден ни в сборке, ни в корне проекта!"
-              exit 1
-            fi
-          fi
-          
-          cd "$BUILD_DIR"
+          # TanStack Start должен собрать всё в .output/public
+          cd ./.output/public
           cp index.html 404.html
           touch .nojekyll
 
@@ -69,7 +44,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ env.BUILD_DIR }}
+          path: './.output/public'
 
       - name: Deploy to GitHub Pages
         id: deployment
