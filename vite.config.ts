@@ -21,6 +21,6 @@ export default defineConfig({
     },
   },
   vite: {
-    base: '/pixel-perfect-snapshot-1456/',
+    base: '/gidautoschool/',
   },
 });
