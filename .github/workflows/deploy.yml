@@ -33,27 +33,32 @@ jobs:
 
       - name: Fix SPA routing and bypass Jekyll
         run: |
-          # Пытаемся найти папку сборки в стандартных местах
-          if [ -f "./dist/client/index.html" ]; then
+          # Определяем папку сборки
+          if [ -d "./dist/client/assets" ]; then
             BUILD_DIR="./dist/client"
-          elif [ -f "./.output/public/index.html" ]; then
+          elif [ -d "./.output/public/assets" ]; then
             BUILD_DIR="./.output/public"
-          elif [ -f "./dist/index.html" ]; then
+          elif [ -d "./dist/assets" ]; then
             BUILD_DIR="./dist"
           else
-            # Если не нашли, ищем по всему проекту
-            INDEX_PATH=$(find . -name "index.html" -not -path "*/node_modules/*" | head -n 1)
-            if [ -z "$INDEX_PATH" ]; then
-              echo "❌ Ошибка: index.html не найден!"
-              exit 1
-            fi
-            BUILD_DIR=$(dirname "$INDEX_PATH")
+            echo "❌ ОШИБКА: Папка с ассетами (assets) не найдена!"
+            exit 1
           fi
           
-          echo "✅ Файл index.html найден в папке: $BUILD_DIR"
+          echo "✅ Папка сборки: $BUILD_DIR"
           echo "BUILD_DIR=$BUILD_DIR" >> $GITHUB_ENV
           
-          # Создаем 404.html и .nojekyll
+          # Если index.html нет в папке сборки, копируем его из корня проекта
+          if [ ! -f "$BUILD_DIR/index.html" ]; then
+            if [ -f "./index.html" ]; then
+              echo "Копируем index.html из корня в $BUILD_DIR"
+              cp ./index.html "$BUILD_DIR/index.html"
+            else
+              echo "❌ ОШИБКА: index.html не найден ни в сборке, ни в корне проекта!"
+              exit 1
+            fi
+          fi
+          
           cd "$BUILD_DIR"
           cp index.html 404.html
           touch .nojekyll
