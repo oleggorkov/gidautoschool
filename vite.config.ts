@@ -12,22 +12,24 @@ import react from '@vitejs/plugin-react';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 
 export default defineConfig({
-  plugins: [
-    tanstackStart({
-      server: { entry: 'server' },
-      spa: { enabled: true, prerender: { enabled: false } },
-    }),
-    react(),
-  ],
-  base: '/gidautoschool/',
-  ssr: {
-      noExternal: true,
+  tanstackStart: {
+    server: { entry: "server" },
+    spa: {
+      enabled: true,
+      prerender: {
+        enabled: true,        // 👈 Включаем обратно, чтобы сгенерировался index.html
+        crawlLinks: false,    // 👈 Отключаем сканирование ссылок
+        pages: [{ path: '/' }] // 👈 Генерируем только главную страницу
+      },
     },
-  css: {
-      postcss: {}, 
-    },
-  nitro: { preset: 'static' },
+  },
+  vite: {
+    base: '/gidautoschool/',
+  },
+  nitro: {
+    preset: 'static',
+  },
   build: {
-    cssMinify: false, // Отключаем минификатор CSS, чтобы обойти баг Vite 8 + Tailwind
+    cssMinify: false,
   },
 });
