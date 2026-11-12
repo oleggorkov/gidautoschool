@@ -22,6 +22,6 @@ export default defineConfig({
   base: '/gidautoschool/',
   nitro: { preset: 'static' },
   build: {
-    cssMinify: 'esbuild',
+    cssMinify: false, // Отключаем минификатор CSS, чтобы обойти баг Vite 8 + Tailwind
   },
 });
