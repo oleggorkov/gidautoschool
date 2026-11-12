@@ -37,7 +37,7 @@ jobs:
       # 👇 Добавляем исправление для SPA (чтобы не было 404 при обновлении)
       - name: Fix SPA routing and bypass Jekyll
         run: |
-          cd ./.output/public
+          cd ./dist/client
           cp index.html 404.html
           touch .nojekyll
 
