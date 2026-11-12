@@ -11,19 +11,11 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
   tanstackStart: {
-    server: { entry: "server" },
-    // Включаем SPA-режим для стабильной работы на GitHub Pages
+    server: { entry: "server" }, // Указывает на src/server.ts
     spa: {
       enabled: true,
       prerender: {
-        enabled: true,
-        // Отключаем автоматический обход, чтобы сборщик не пытался искать страницы по корневому пути "/"
-        crawlLinks: false,
-        // Явно указываем, какие страницы нужно сгенерировать
-        pages: [
-          { path: '/' } // Генерируем только главную страницу как "оболочку"
-        ],
-        outputPath: 'index.html',
+        enabled: false, // 👈 Полностью отключаем пререндер
       },
     },
   },
