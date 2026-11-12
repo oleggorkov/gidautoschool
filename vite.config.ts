@@ -23,4 +23,7 @@ export default defineConfig({
   vite: {
     base: '/gidautoschool/',
   },
+  nitro: {
+    preset: 'static' 
+  },
 });
