@@ -17,9 +17,10 @@ export default defineConfig({
     spa: {
       enabled: true,
       prerender: {
-        enabled: true,        // 👈 Включаем обратно, чтобы сгенерировался index.html
-        crawlLinks: false,    // 👈 Отключаем сканирование ссылок
-        pages: [{ path: '/' }] // 👈 Генерируем только главную страницу
+        enabled: true,
+        crawlLinks: false,
+        pages: [{ path: '/' }],
+        outputPath: 'index.html', // 👈 Ключевая настройка
       },
     },
   },
