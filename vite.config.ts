@@ -11,14 +11,13 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
   tanstackStart: {
-    server: { entry: "server" },
-    prerender: {
+    // Включаем SPA-режим
+    spa: {
       enabled: true,
-      autoSubfolderIndex: true,
-      crawlLinks: false, // 👈 Отключаем автоматический обход
-      pages: [ // 👈 Явно указываем, что нужно пререндерить
-        { path: '/' } 
-      ],
+      prerender: {
+        enabled: true, // Оставляем, чтобы сгенерировать оболочку
+        // outputPath: '_shell.html', // Можно раскомментировать, если нужно
+      },
     },
   },
   vite: {
