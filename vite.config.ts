@@ -7,22 +7,18 @@
 // the build fails. Never add compression (compressPublicAssets, vite-plugin-compression):
 // hosting already compresses at the edge.
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
-import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 
 export default defineConfig({
-  tanstackStart: {
-    server: { entry: "server" }, // Указывает на src/server.ts
-    spa: {
-      enabled: true,
-      prerender: {
-        enabled: false, // 👈 Полностью отключаем пререндер
-      },
-    },
-  },
-  vite: {
-    base: '/gidautoschool/',
-  },
-  nitro: {
-    preset: 'static',
-  },
+  plugins: [
+    tanstackStart({
+      server: { entry: 'server' },
+      spa: { enabled: true, prerender: { enabled: false } },
+    }),
+    react(),
+  ],
+  base: '/gidautoschool/',
+  nitro: { preset: 'static' },
 });
