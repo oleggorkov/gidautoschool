@@ -12,6 +12,7 @@ import react from '@vitejs/plugin-react';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 
 export default defineConfig({
+  base: '/gidautoschool/',
   tanstackStart: {
     server: { entry: "server" },
     spa: {
@@ -23,9 +24,6 @@ export default defineConfig({
         outputPath: 'index.html', // 👈 Ключевая настройка
       },
     },
-  },
-  vite: {
-    base: '/gidautoschool/',
   },
   nitro: {
     preset: 'static',
