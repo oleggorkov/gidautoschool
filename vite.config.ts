@@ -15,8 +15,10 @@ export default defineConfig({
     prerender: {
       enabled: true,
       autoSubfolderIndex: true,
-      autoStaticPathsDiscovery: true,
-      crawlLinks: true, // 👈 Важно: заставляет краулер искать ссылки для пререндера
+      crawlLinks: false, // 👈 Отключаем автоматический обход
+      pages: [ // 👈 Явно указываем, что нужно пререндерить
+        { path: '/' } 
+      ],
     },
   },
   vite: {
