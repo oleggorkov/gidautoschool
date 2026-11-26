@@ -35,16 +35,24 @@ jobs:
       - name: Build
         run: bun run build
 
-      - name: Inspect build output
+      - name: Prepare static site
         run: |
-          echo "=== HTML FILES ==="
-          find .output -type f -name "*.html"
+          set -e
 
-          echo "=== START MANIFEST ==="
-          find .output -type f -iname "*manifest*"
+          BUILD_DIR=".output/public"
 
-          echo "=== PUBLIC INDEX ==="
-          cat .output/public/index.html
+          echo "=== GENERATED SHELL ==="
+          cat "$BUILD_DIR/_shell.html"
+
+          cp "$BUILD_DIR/_shell.html" "$BUILD_DIR/index.html"
+          cp "$BUILD_DIR/_shell.html" "$BUILD_DIR/404.html"
+
+          touch "$BUILD_DIR/.nojekyll"
+
+          echo "=== FINAL FILES ==="
+          ls -la "$BUILD_DIR"
+
+          test -f "$BUILD_DIR/index.html"
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
