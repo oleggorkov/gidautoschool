@@ -37,19 +37,25 @@ jobs:
 
       - name: Prepare static site
         run: |
-          set -euo pipefail
+          set -e
 
           BUILD_DIR=".output/public"
 
-          echo "Checking generated website..."
-          ls -la "$BUILD_DIR"
+          echo "=== FILES IN PUBLIC ==="
+          find "$BUILD_DIR" -maxdepth 3 -type f
+
+          echo "=== INDEX.HTML ==="
+          cat "$BUILD_DIR/index.html"
+
+          if grep -q '/src/start.ts' "$BUILD_DIR/index.html"; then
+            echo "ERROR: Source index.html was copied instead of production HTML"
+            exit 1
+          fi
 
           test -f "$BUILD_DIR/index.html"
 
           cp "$BUILD_DIR/index.html" "$BUILD_DIR/404.html"
           touch "$BUILD_DIR/.nojekyll"
-
-          echo "BUILD_DIR=$BUILD_DIR" >> "$GITHUB_ENV"
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
