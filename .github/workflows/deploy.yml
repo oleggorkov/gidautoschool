@@ -41,21 +41,19 @@ jobs:
 
           BUILD_DIR=".output/public"
 
-          echo "=== FILES IN PUBLIC ==="
+          echo "=== GENERATED FILES ==="
           find "$BUILD_DIR" -maxdepth 3 -type f
 
-          echo "=== INDEX.HTML ==="
-          cat "$BUILD_DIR/index.html"
+          echo "=== CHECK SPA SHELL ==="
+          test -f "$BUILD_DIR/_shell.html"
 
-          if grep -q '/src/start.ts' "$BUILD_DIR/index.html"; then
-            echo "ERROR: Source index.html was copied instead of production HTML"
-            exit 1
-          fi
+          cp "$BUILD_DIR/_shell.html" "$BUILD_DIR/index.html"
+          cp "$BUILD_DIR/_shell.html" "$BUILD_DIR/404.html"
 
-          test -f "$BUILD_DIR/index.html"
-
-          cp "$BUILD_DIR/index.html" "$BUILD_DIR/404.html"
           touch "$BUILD_DIR/.nojekyll"
+
+          echo "=== FINAL INDEX ==="
+          cat "$BUILD_DIR/index.html"
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
