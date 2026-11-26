@@ -1,3 +1,4 @@
+
 name: Deploy to GitHub Pages
 
 on:
@@ -12,14 +13,16 @@ permissions:
 
 concurrency:
   group: github-pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,12 +44,15 @@ jobs:
 
           BUILD_DIR=".output/public"
 
-          echo "=== GENERATED SHELL ==="
-          cat "$BUILD_DIR/_shell.html"
+          if [ ! -f "$BUILD_DIR/_shell.html" ]; then
+            echo "ERROR: _shell.html not found"
+            echo "Contents of .output/public:"
+            ls -la "$BUILD_DIR"
+            exit 1
+          fi
 
           cp "$BUILD_DIR/_shell.html" "$BUILD_DIR/index.html"
           cp "$BUILD_DIR/_shell.html" "$BUILD_DIR/404.html"
-
           touch "$BUILD_DIR/.nojekyll"
 
           echo "=== FINAL FILES ==="
@@ -57,10 +63,11 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: .output/public
 
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
