@@ -26,7 +26,7 @@ export function GameSelectionSection({ reward, onReward }: { reward: Reward | nu
   const game = GAMES.find(g => g.id === active);
   return <section ref={ref} id="games" className="min-h-screen bg-background text-foreground">
     <header className="mx-auto flex max-w-6xl items-center justify-between gap-4 border-b border-border px-5 py-3 sm:px-8">
-      <img src={`${import.meta.env.BASE_URL}autogid-logo.png`} alt="Автошкола Автогид — твой путь к уверенности" className="h-16 w-48 object-cover sm:h-20 sm:w-60" />
+      <img src={`${import.meta.env.BASE_URL}autogid-logo.png`} alt="Автошкола Автогид — твой путь к уверенности" className="h-16 w-48 sm:h-20 sm:w-60" />
       <span className="text-right text-xs font-semibold text-muted-foreground">Твой путь<br />к уверенности</span>
     </header>
     <div className="mx-auto max-w-6xl px-5 py-9 sm:px-8 sm:py-12">
