@@ -3,7 +3,6 @@ import { ArrowUpRight, Clock, Gift } from "lucide-react";
 import carImg from "@/assets/car-autogid.png";
 import engineImg from "@/assets/engine.jpg";
 import raceImg from "@/assets/race.jpg";
-import logo from "@/assets/autogid-logo.png.asset.json";
 import { Button } from "@/components/ui/button";
 import { PROMO_CONFIG, type GameId } from "@/lib/promo/config";
 import { formatRub, issueReward, type Reward } from "@/lib/promo/promo";
@@ -27,7 +26,7 @@ export function GameSelectionSection({ reward, onReward }: { reward: Reward | nu
   const game = GAMES.find(g => g.id === active);
   return <section ref={ref} id="games" className="min-h-screen bg-background text-foreground">
     <header className="mx-auto flex max-w-6xl items-center justify-between gap-4 border-b border-border px-5 py-3 sm:px-8">
-      <img src={logo.url} alt="Автошкола Автогид — твой путь к уверенности" className="h-16 w-48 object-cover sm:h-20 sm:w-60" />
+      <img src={`${import.meta.env.BASE_URL}autogid-logo.png`} alt="Автошкола Автогид — твой путь к уверенности" className="h-16 w-48 object-cover sm:h-20 sm:w-60" />
       <span className="text-right text-xs font-semibold text-muted-foreground">Твой путь<br />к уверенности</span>
     </header>
     <div className="mx-auto max-w-6xl px-5 py-9 sm:px-8 sm:py-12">
