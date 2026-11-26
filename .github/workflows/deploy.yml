@@ -2,13 +2,17 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
   id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
 
 jobs:
   build-and-deploy:
@@ -26,31 +30,31 @@ jobs:
           bun-version: latest
 
       - name: Install dependencies
-        run: bun install
+        run: bun install --frozen-lockfile
 
       - name: Build
         run: bun run build
 
-      - name: Fix SPA routing and find index.html
+      - name: Prepare static site for GitHub Pages
+        shell: bash
         run: |
-          # Ищем папку, где лежит index.html
-          if [ -f "./dist/client/index.html" ]; then
-            BUILD_DIR="./dist/client"
-          elif [ -f "./.output/public/index.html" ]; then
-            BUILD_DIR="./.output/public"
-          elif [ -f "./dist/index.html" ]; then
-            BUILD_DIR="./dist"
+          set -euo pipefail
+          if [[ -f .output/public/index.html ]]; then
+            BUILD_DIR=".output/public"
+          elif [[ -f dist/client/index.html ]]; then
+            BUILD_DIR="dist/client"
+          elif [[ -f dist/index.html ]]; then
+            BUILD_DIR="dist"
           else
-            echo "❌ ОШИБКА: index.html не найден!"
+            echo "Could not find generated index.html. Build output:" >&2
+            find . -maxdepth 4 -name index.html -not -path './node_modules/*' -print >&2
             exit 1
           fi
-          
-          echo "✅ Нашли index.html в: $BUILD_DIR"
-          echo "BUILD_DIR=$BUILD_DIR" >> $GITHUB_ENV
-          
-          cd "$BUILD_DIR"
-          cp index.html 404.html
-          touch .nojekyll
+
+          echo "Using build directory: ${BUILD_DIR}"
+          cp "${BUILD_DIR}/index.html" "${BUILD_DIR}/404.html"
+          touch "${BUILD_DIR}/.nojekyll"
+          echo "BUILD_DIR=${BUILD_DIR}" >> "$GITHUB_ENV"
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -58,9 +62,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # 👇 Явно указываем имя, которое ожидает deploy-pages
-          name: github-pages
-          # 👇 Используем путь, найденный на предыдущем шаге
           path: ${{ env.BUILD_DIR }}
 
       - name: Deploy to GitHub Pages
